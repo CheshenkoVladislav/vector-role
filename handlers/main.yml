@@ -1,0 +1,9 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Start vector
+  become: true
+  ansible.builtin.systemd_service:
+    name: vector
+    state: restarted
+    enabled: yes 
+# handlers file for vector-role

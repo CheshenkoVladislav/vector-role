@@ -1,0 +1,19 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Get vector distrib
+  ansible.builtin.get_url:
+    url: "https://packages.timber.io/vector/0.53.0/vector-0.53.0-1.x86_64.rpm"
+    dest: /tmp/vector.rpm
+- name: Install vector
+  become: true
+  ansible.builtin.yum:
+    disable_gpg_check: yes
+    name: /tmp/vector.rpm
+      # notify: Start vector
+- name: Start vector
+  become: true
+  ansible.builtin.systemd_service:
+    name: vector
+    state: restarted
+    enabled: yes
+# tasks file for vector-role
