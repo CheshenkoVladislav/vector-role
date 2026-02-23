@@ -1,0 +1,17 @@
+---
+- name: Verify vector config
+  hosts: all
+  gather_facts: false # Quicker, if you do not need facts
+  tasks:
+    - name: Assert something
+      ansible.builtin.shell: ps aux | grep vector -c
+      register: vector_proc_count
+    - name: Show debug info
+      ansible.builtin.debug:
+        msg:
+          - "Raw output: {{ vector_proc_count.stdout }}"
+          - "As integer: {{ vector_proc_count.stdout | int }}"
+          - "Complete object: {{ vector_proc_count }}"
+    - name: Assert vector is running``
+      ansible.builtin.assert:
+        that: vector_proc_count.stdout != "0"

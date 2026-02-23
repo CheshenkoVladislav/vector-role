@@ -1,19 +1,36 @@
 #SPDX-License-Identifier: MIT-0
 ---
-- name: Get vector distrib
+- name: Print vars
+  ansible.builtin.debug:
+    var: ansible_service_mgr
+- name: Get vector distrib 'Fedora'
+  when: ansible_distribution == 'Fedora'
   ansible.builtin.get_url:
     url: "https://packages.timber.io/vector/0.53.0/vector-0.53.0-1.x86_64.rpm"
     dest: /tmp/vector.rpm
-- name: Install vector
+- name: Install vector 'Fedora'
   become: true
+  when: ansible_distribution == 'Fedora'
   ansible.builtin.yum:
     disable_gpg_check: yes
     name: /tmp/vector.rpm
-      # notify: Start vector
-- name: Start vector
+  notify: start vector
+- name: Get vector distrib 'Ubuntu'
+  when: ansible_distribution == 'Ubuntu'
+  ansible.builtin.get_url:
+    url: "https://packages.timber.io/vector/0.53.0/vector_0.53.0-1_amd64.deb"
+    dest: /tmp/vector.deb
+    mode: "u=rwx,g=rx,o=rx"
+- name: Install vector 'Ubuntu'
+  when: ansible_distribution == 'Ubuntu'
   become: true
-  ansible.builtin.systemd_service:
-    name: vector
-    state: restarted
-    enabled: yes
+  ansible.builtin.apt:
+    deb: /tmp/vector.deb
+    state: present
+  notify: start vector
+- name: Create vector config
+  become: true
+  ansible.builtin.template:
+    src: vector.yaml.j2
+    dest: /etc/vector/vector.yaml
 # tasks file for vector-role

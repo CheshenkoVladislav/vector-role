@@ -1,9 +1,16 @@
 #SPDX-License-Identifier: MIT-0
 ---
-- name: Start vector
+- name: Start vector docker
+  ansible.builtin.shell: |
+    setsid /usr/bin/vector --config /etc/vector/vector.yaml > ~/vector.log 2>&1 < /dev/null &
+  when: ansible_service_mgr != "systemd"
+  listen: "start vector"
+  state: started
+- name: Start vector VM
   become: true
   ansible.builtin.systemd_service:
     name: vector
     state: restarted
-    enabled: yes 
-# handlers file for vector-role
+    enabled: yes
+  when: ansible_service_mgr == "systemd"
+  listen: "start vector"

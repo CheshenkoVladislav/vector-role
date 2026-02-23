@@ -1,6 +1,7 @@
 #SPDX-License-Identifier: MIT-0
 galaxy_info:
-  author: your name
+  author: cheshenko_vladislav
+  role_name: vector_role
   description: your role description
   company: your company (optional)
 
