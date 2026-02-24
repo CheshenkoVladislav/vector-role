@@ -5,7 +5,6 @@
     setsid /usr/bin/vector --config /etc/vector/vector.yaml > ~/vector.log 2>&1 < /dev/null &
   when: ansible_service_mgr != "systemd"
   listen: "start vector"
-  state: started
 - name: Start vector VM
   become: true
   ansible.builtin.systemd_service:

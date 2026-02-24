@@ -1,0 +1,74 @@
+---
+- name: Prepare
+  hosts: all
+  remote_user: root
+  gather_facts: false 
+  tasks:
+    # - name: Check Python binary existence
+    #   stat:
+    #     path: /usr/bin/python3
+    #   register: python_binary
+    #   failed_when: false
+    #   changed_when: false
+    # - name: Check if Python is installed
+    #   raw: which python3 || command -v python3 || echo "not_installed"
+    #   register: python_check
+    #   changed_when: false
+    #   failed_when: false
+    - name: Check OS Version
+      raw: cat /etc/os-release | grep ^ID= | cut -d= -f2 | tr -d '"' | tr -d '\n'
+      register: os_name
+    - name: Print vars
+      ansible.builtin.debug:
+        var: os_name
+    # - name: Update dnf cache
+    #   raw: dnf update
+    #   when: os_name.stdout == "fedora\n"
+    - name: Update apt cache
+      raw: apt update
+      when: os_name.stdout == "ubuntu"
+    - name: Install Python
+      raw: apt install -y python3
+      when: os_name.stdout == "ubuntu"
+    - name: Create test user ubuntu
+      ansible.builtin.user:
+        name: testuser
+        # createhome: true
+        shell: /bin/bash
+        groups: sudo
+        state: present
+      when: os_name.stdout == 'ubuntu'
+    - name: Install sudo
+      ansible.builtin.apt:
+        name: sudo
+        state: present
+        update_cache: yes
+      when: os_name.stdout == "ubuntu"
+
+    # - name: Debug os_name
+    #   debug:
+    #     msg: "os_name is '{{ os_name.stdout }}'"
+
+    - name: Install Python dnf
+      raw: dnf install -y python3
+      when: os_name.stdout == "fedora"
+    - name: Create test user fedora
+      ansible.builtin.user:
+        name: testuser
+        # createhome: true
+        shell: /bin/bash
+        groups: wheel
+        state: present
+      when: os_name.stdout == 'fedora'
+    - name: Install util-linux
+      ansible.builtin.dnf:
+        name: util-linux
+        state: present
+        update_cache: yes
+      when: os_name.stdout == "fedora"
+    - name: Install PS dnf
+      raw: dnf install -y procps-ng
+      when: os_name.stdout == "fedora"
+
+    - name: Add default user sodoers ubuntu
+      raw: "echo 'testuser ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers"

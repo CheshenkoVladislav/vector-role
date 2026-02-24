@@ -1,0 +1,5 @@
+selinux
+ansible-lint==26.1.1
+lxml
+molecule==25.12.0
+molecule-docker

@@ -1,0 +1,26 @@
+---
+driver:
+  name: docker
+dependency:
+  name: galaxy
+  enabled: false
+provisioner:
+  name: ansible
+  playbooks:
+    converge: converge.yml
+  env:
+    ANSIBLE_ROLES_PATH: ../../../  # поднимаемся на 3 уровня вверх
+    ANSIBLE_BECOME_METHOD: sudo
+    ANSIBLE_BECOME_USER: root
+platforms:
+  - name: molecule-ubuntu
+    image: ubuntu:latest
+
+scenario:
+  name: tox
+  test_sequence:
+    - destroy
+    - create
+    - prepare
+    - converge
+    - destroy
